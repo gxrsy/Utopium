@@ -20,7 +20,7 @@
             overflow: hidden;
         }
 
-        /* The Grid Layer - Faded even more into the shadows */
+        /* The Grid Layer - Opacity increased to 0.25 for high visibility */
         .grid {
             position: absolute;
             top: 0;
@@ -28,8 +28,8 @@
             width: 100%;
             height: 100%;
             background-image: 
-                linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+                linear-gradient(to right, rgba(255, 255, 255, 0.25) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.25) 1px, transparent 1px);
             background-size: 40px 40px;
             pointer-events: none; 
             z-index: 2;
@@ -72,7 +72,7 @@
             glow.style.left = `${x}px`;
             glow.style.top = `${y}px`;
 
-            // Pushes the super-faint grid away
+            // Pushes the grid away
             const maskCSS = `radial-gradient(circle 120px at ${x}px ${y}px, transparent 10%, black 70%)`;
             grid.style.maskImage = maskCSS;
             grid.style.webkitMaskImage = maskCSS;
