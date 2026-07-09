@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dark Midnight Gradient</title>
+    <title>Dark Gradient with Grid</title>
     <style>
         /* Reset default margins and padding */
         * {
@@ -12,10 +12,29 @@
             box-sizing: border-box;
         }
 
-        /* Deep, dark gradient from top-left to bottom-right across the whole screen */
+        /* Set up the base gradient background */
         body {
             min-height: 100vh;
             background: linear-gradient(to bottom right, #0a1128, #000000);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Create the grid overlay using a pseudo-element */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* 40px by 40px grid cells using linear-gradients */
+            background-image: 
+                linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            /* Ensures the grid doesn't block clicks if you add buttons later */
+            pointer-events: none; 
         }
     </style>
 </head>
