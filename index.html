@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Fine Grid</title>
+    <title>Interactive Distorting Grid</title>
     <style>
         /* Reset default margins and padding */
         * {
@@ -20,7 +20,7 @@
             overflow: hidden;
         }
 
-        /* The Grid Layer - Now much smaller and tighter */
+        /* The Grid Layer - Reverted to 40px and now uses a mask for the push effect */
         .grid {
             position: absolute;
             top: 0;
@@ -28,23 +28,26 @@
             width: 100%;
             height: 100%;
             background-image: 
-                linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-                linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
-            /* Shrunk down from 40px to 15px for a smaller grid size */
-            background-size: 15px 15px;
+                linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
             pointer-events: none; 
             z-index: 2;
+
+            /* This mask hides the grid directly under the mouse to simulate it pushing away */
+            mask-image: var(--mask);
+            -webkit-mask-image: var(--mask);
         }
 
-        /* The Mouse Glow Effect */
+        /* The Mouse Glow Effect - Now much smaller and tighter */
         .glow {
             position: absolute;
-            width: 600px;
-            height: 600px;
-            background: radial-gradient(circle, rgba(10, 25, 70, 0.6) 0%, rgba(0, 0, 0, 0) 70%);
+            width: 200px; /* Shrunk down from 600px */
+            height: 200px; /* Shrunk down from 600px */
+            background: radial-gradient(circle, rgba(10, 35, 100, 0.8) 0%, rgba(0, 0, 0, 0) 70%);
             top: 0;
             left: 0;
-            transition: transform 0.1s ease-out;
+            transition: transform 0.08s ease-out;
             pointer-events: none;
             z-index: 1;
             transform: translate(-50%, -50%);
@@ -55,18 +58,27 @@
 <body>
 
     <div class="glow" id="glow"></div>
-    <div class="grid"></div>
+    <div class="grid" id="grid"></div>
 
     <script>
         const glow = document.getElementById('glow');
+        const grid = document.getElementById('grid');
 
         // Track mouse movement across the window
         window.addEventListener('mousemove', (e) => {
             const x = e.clientX;
             const y = e.clientY;
             
-            // Move the glow element to the mouse position
-            glow.style.transform = `translate(${x - 300}px, ${y - 300}px)`;
+            // Move the smaller glow element to the mouse position
+            glow.style.transform = `translate(${x - 100}px, ${y - 100}px)`; // Adjusted offset for 200px width
+
+            /* Creates a dynamic CSS mask that punches a transparent hole in the grid 
+              right under the mouse, giving the visual illusion that the grid lines 
+              are being pushed away.
+            */
+            const maskCSS = `radial-gradient(circle 120px at ${x}px ${y}px, transparent 10%, black 70%)`;
+            grid.style.maskImage = maskCSS;
+            grid.style.webkitMaskImage = maskCSS;
         });
     </script>
 
