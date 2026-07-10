@@ -25,8 +25,12 @@
             min-height: 200vh; 
             position: relative;
             overflow-x: hidden;
-            /* Extra padding at the top so content isn't hidden under the fixed top bar */
             padding-top: 60px; 
+            
+            /* Flexbox to perfectly center the main content area */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start; /* Keeps it naturally positioned near the top half */
         }
 
         /* Fixed Black Top Bar */
@@ -38,7 +42,27 @@
             height: 60px;
             background-color: #000000;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            z-index: 1000; /* Keeps it layered above the background and stars */
+            z-index: 1000;
+        }
+
+        /* Centered Content Wrapper */
+        .main-content {
+            position: relative;
+            z-index: 10;
+            margin-top: 10vh; /* Adjust this to move the image higher or lower */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Centered Logo/Image Styling */
+        .centered-image {
+            max-width: 400px; /* Limits maximum width */
+            width: 100%;       /* Makes it responsive on smaller screens */
+            height: auto;
+            display: block;
+            user-select: none;
+            -webkit-user-drag: none;
         }
 
         /* Starfield Container */
@@ -70,6 +94,10 @@
 
     <div class="top-bar"></div>
 
+    <div class="main-content">
+        <img class="centered-image" src="https://via.placeholder.com/400" alt="Utopium Reseller Logo">
+    </div>
+
     <div id="starfield"></div>
 
     <script>
@@ -81,16 +109,13 @@
             const star = document.createElement('div');
             star.classList.add('star');
             
-            // Randomize sizing (between 1px and 3px)
             const size = Math.random() * 2 + 1;
             star.style.width = `${size}px`;
             star.style.height = `${size}px`;
             
-            // Randomize positions across the entire scrollable document height
             star.style.top = `${Math.random() * 100}%`;
             star.style.left = `${Math.random() * 100}%`;
             
-            // Randomize twinkle speed and delay
             star.style.animationDuration = `${Math.random() * 3 + 2}s`;
             star.style.animationDelay = `${Math.random() * 5}s`;
             
