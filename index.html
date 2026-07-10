@@ -21,16 +21,15 @@
             background-size: 50px 50px;
             background-position: center;
             
-            /* Making the page tall enough to scroll up and down */
-            min-height: 200vh; 
+            /* Lock the screen height and hide scrollbars completely */
+            height: 100vh; 
+            overflow: hidden;
             position: relative;
-            overflow-x: hidden;
-            padding-top: 60px; 
             
-            /* Flexbox to perfectly center the main content area */
+            /* Flexbox to perfectly center everything in the viewport */
             display: flex;
             justify-content: center;
-            align-items: flex-start; /* Keeps it naturally positioned near the top half */
+            align-items: center;
         }
 
         /* Fixed Black Top Bar */
@@ -49,7 +48,8 @@
         .main-content {
             position: relative;
             z-index: 10;
-            margin-top: 10vh; /* Adjust this to move the image higher or lower */
+            /* Pushes down slightly to account for the top bar height */
+            margin-top: 60px; 
             display: flex;
             justify-content: center;
             align-items: center;
@@ -58,7 +58,8 @@
         /* Centered Logo/Image Styling */
         .centered-image {
             max-width: 400px; /* Limits maximum width */
-            width: 100%;       /* Makes it responsive on smaller screens */
+            max-height: 70vh; /* Prevents image from overflowing vertically */
+            width: 100%;       
             height: auto;
             display: block;
             user-select: none;
@@ -95,15 +96,15 @@
     <div class="top-bar"></div>
 
     <div class="main-content">
-        <img class="centered-image" src="https://via.placeholder.com/400" alt="Utopium Reseller Logo">
+        <img class="centered-image" src="New Piskel.png" alt="Utopium Reseller Logo">
     </div>
 
     <div id="starfield"></div>
 
     <script>
-        // Script to generate random, twinkling stars across the scrollable height
+        // Script to generate random, twinkling stars across the fixed screen area
         const starfield = document.getElementById('starfield');
-        const numberOfStars = 60; 
+        const numberOfStars = 40; // Reduced slightly for a clean look on a single screen
 
         for (let i = 0; i < numberOfStars; i++) {
             const star = document.createElement('div');
