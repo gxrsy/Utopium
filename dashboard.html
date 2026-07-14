@@ -14,20 +14,28 @@
         }
 
         body {
-            background-color: #1a1a1a; /* Dark gray background */
+            background-color: #1a1a1a; /* Clean dark-gray background */
             color: #ffffff;
             height: 100vh;
             width: 100vw;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             position: relative;
             overflow: hidden;
+            display: flex;
         }
 
-        /* Top-Left Logo */
-        .logo {
+        /* --- LEFT SIDE NAVIGATION AREA --- */
+        .left-menu {
             position: absolute;
             top: 30px;
             left: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Logo styling */
+        .logo {
             font-size: 1.5rem;
             font-weight: 700;
             text-decoration: none;
@@ -35,11 +43,14 @@
             letter-spacing: -0.5px;
         }
 
-        /* Account Header */
+        /* Menu grouping */
+        .menu-group {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
         .account-header {
-            position: absolute;
-            top: 110px;
-            left: 40px;
             font-size: 1.1rem;
             font-weight: 800;
             color: #ffffff;
@@ -47,29 +58,102 @@
             text-transform: uppercase;
         }
 
-        /* Clickable Overview Button - smaller and placed under the header */
+        /* Clickable Overview Button */
         .btn-overview {
-            position: absolute;
-            top: 155px;
-            left: 40px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: rgba(255, 255, 255, 0.8);
-            padding: 8px 16px;
-            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            padding: 10px 20px;
+            border-radius: 8px;
             font-size: 0.85rem;
             font-weight: 600;
             cursor: pointer;
             text-decoration: none;
             transition: all 0.2s ease;
+            width: max-content;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .btn-overview:hover {
-            background: rgba(255, 255, 255, 0.12);
-            color: #ffffff;
-            border-color: rgba(255, 255, 255, 0.25);
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
         }
 
+
+        /* --- CENTER WORKSPACE PANELS --- */
+        .main-workspace {
+            margin-left: 240px; /* Offset to clear the left menu position */
+            margin-top: 100px;
+            padding: 40px;
+            width: calc(100% - 240px);
+            max-width: 1100px;
+            overflow-y: auto;
+            height: calc(100vh - 100px);
+        }
+
+        /* Account Overview Section Title */
+        .section-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 20px;
+            letter-spacing: -0.2px;
+        }
+
+        /* Horizontal Card Grid */
+        .overview-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            width: 100%;
+        }
+
+        /* Custom Dark Gray Cards */
+        .overview-card {
+            background: #242424; /* Solid slightly lighter gray background */
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 24px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            min-height: 120px;
+        }
+
+        .card-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.4);
+            text-transform: capitalize;
+        }
+
+        .card-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-top: auto;
+        }
+
+        .card-subtext {
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.35);
+            margin-top: -4px;
+        }
+
+        /* Icons in Top-Right corner of each card */
+        .card-icon {
+            position: absolute;
+            top: 24px;
+            right: 24px;
+            color: rgba(255, 255, 255, 0.25);
+            font-size: 1.1rem;
+        }
+
+
+        /* --- TOP & BOTTOM RIGHT CORNERS --- */
         /* Top-Right Sign Out Button */
         .btn-signout {
             position: absolute;
@@ -108,11 +192,43 @@
 </head>
 <body>
 
-    <a href="index.html" class="logo">requiemx</a>
-    
-    <div class="account-header">Account</div>
+    <div class="left-menu">
+        <a href="index.html" class="logo">requiemx</a>
+        
+        <div class="menu-group">
+            <div class="account-header">Account</div>
+            <button class="btn-overview" id="overviewBtn">
+                <span>👤</span> Overview
+            </button>
+        </div>
+    </div>
 
-    <button class="btn-overview" id="overviewBtn">Overview</button>
+    <main class="main-workspace">
+        <h2 class="section-title">Account Overview</h2>
+        
+        <div class="overview-grid">
+            <div class="overview-card">
+                <span class="card-icon">✏️</span>
+                <div class="card-label">Username</div>
+                <div class="card-value" id="cardUsername">...</div>
+                <div class="card-subtext">Change available now</div>
+            </div>
+
+            <div class="overview-card">
+                <span class="card-icon">👤</span>
+                <div class="card-label">Alias</div>
+                <div class="card-value">0 aliases used</div>
+                <div class="card-subtext">1 alias slots remaining</div>
+            </div>
+
+            <div class="overview-card">
+                <span class="card-icon">#</span>
+                <div class="card-label">UID</div>
+                <div class="card-value" id="cardUid">522,909</div>
+                <div class="card-subtext">Among the first 25%</div>
+            </div>
+        </div>
+    </main>
     
     <button class="btn-signout" id="signOutBtn">Sign Out</button>
 
@@ -127,7 +243,11 @@
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         const signOutBtn = document.getElementById('signOutBtn');
         const overviewBtn = document.getElementById('overviewBtn');
+        
+        // Dynamic Card Elements
         const userDisplay = document.getElementById('userDisplay');
+        const cardUsername = document.getElementById('cardUsername');
+        const cardUid = document.getElementById('cardUid');
 
         // Verify Session
         async function checkSession() {
@@ -137,15 +257,30 @@
                 return;
             }
             const cleanUsername = session.user.email.split('@')[0];
+            
+            // Set values dynamically across the dashboard
             userDisplay.innerText = cleanUsername;
+            cardUsername.innerText = cleanUsername;
+            
+            // Generate a persistent, realistic UID mock based on user registration
+            const generatedUid = Math.abs(hashCode(cleanUsername) % 800000) + 100000;
+            cardUid.innerText = Number(generatedUid).toLocaleString();
+        }
+
+        // Helper to consistently generate numbers based on string values
+        function hashCode(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                hash = str.charCodeAt(i) + ((hash << 5) - hash);
+            }
+            return hash;
         }
 
         checkSession();
 
-        // Overview click event
+        // Overview click action
         overviewBtn.addEventListener('click', () => {
-            console.log("Overview button clicked!");
-            // You can easily add functionality here later
+            console.log("Overview workspace active!");
         });
 
         // Sign Out Event
