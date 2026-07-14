@@ -65,7 +65,7 @@
             transform: scale(1.02);
         }
 
-        /* Bottom Center Claim Bar (Matches Guns.lol/Link-in-bio style) */
+        /* Bottom Center Claim Bar */
         .claim-container {
             position: absolute;
             bottom: 12%;
@@ -78,15 +78,6 @@
             max-width: 500px;
             z-index: 5;
             text-align: center;
-        }
-
-        .claim-title {
-            color: rgba(255, 255, 255, 0.4);
-            font-size: 0.85rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            font-weight: 700;
-            margin-bottom: 15px;
         }
 
         .claim-box {
@@ -327,7 +318,6 @@
     </header>
 
     <div class="claim-container">
-        <span class="claim-title">Claim your modern link-in-bio</span>
         <div class="claim-box">
             <span class="claim-prefix">requiemx.vercel.app/</span>
             <input type="text" class="claim-input" id="claimInput" placeholder="username" autocomplete="off" spellcheck="false">
@@ -399,11 +389,35 @@
         const claimBtn = document.getElementById('claimBtn');
 
         let isSignUpMode = false;
+        let currentUserSession = null;
 
-        // Open Modal (Default to login mode)
+        // Check if user has an existing logged-in session on page load
+        async function checkInitialSession() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            currentUserSession = session;
+            updateUIForSession(session);
+        }
+
+        function updateUIForSession(session) {
+            if (session) {
+                openBtn.innerText = "Dashboard";
+            } else {
+                openBtn.innerText = "Sign In";
+            }
+        }
+
+        checkInitialSession();
+
+        // Sign In / Dashboard button click handler
         openBtn.addEventListener('click', () => {
-            switchToMode(false);
-            modal.classList.add('active');
+            if (currentUserSession) {
+                // If signed in, immediately redirect to dashboard
+                window.location.href = "https://requiemx.vercel.app/dashboard.html";
+            } else {
+                // If signed out, open login modal
+                switchToMode(false);
+                modal.classList.add('active');
+            }
         });
 
         // Close Modal via top right X button
@@ -414,6 +428,12 @@
 
         // Handle the landing page "Claim" bar button action
         claimBtn.addEventListener('click', () => {
+            if (currentUserSession) {
+                // If already logged in, redirect directly to dashboard
+                window.location.href = "https://requiemx.vercel.app/dashboard.html";
+                return;
+            }
+
             const desiredUsername = claimInput.value.trim().toLowerCase();
             if (desiredUsername) {
                 switchToMode(true); // Switch directly to Sign Up mode
@@ -425,7 +445,7 @@
             }
         });
 
-        // Open modal if user hits 'Enter' inside the claim input
+        // Open modal or redirect if user hits 'Enter' inside the claim input
         claimInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 claimBtn.click();
@@ -563,6 +583,8 @@
 
         // Active session listener
         supabaseClient.auth.onAuthStateChange((event, session) => {
+            currentUserSession = session;
+            updateUIForSession(session);
             if (event === 'SIGNED_IN') {
                 window.location.href = "https://requiemx.vercel.app/dashboard.html";
             }
