@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>requiemx — Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        /* Top Header Area */
+        .dashboard-header {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 40px;
+        }
+
+        .logo {
+            font-size: 1.25rem;
+            font-weight: 700;
+            text-decoration: none;
+            color: #ffffff;
+        }
+
+        .btn-signout {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            padding: 8px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+        }
+
+        .btn-signout:hover {
+            background: rgba(255, 255, 255, 0.15);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        /* Main Workspace Container */
+        .workspace {
+            width: 100%;
+            max-width: 600px;
+            background: #18181c;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            padding: 2.5rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+        }
+
+        .welcome-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .welcome-subtitle {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.95rem;
+            margin-bottom: 30px;
+        }
+
+        .welcome-subtitle span {
+            color: #ffffff;
+            font-weight: bold;
+        }
+
+        /* Link Customizer Form */
+        .section-title {
+            font-size: 1.05rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 15px;
+        }
+
+        .link-creator-form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 35px;
+            background: #242428;
+            padding: 20px;
+            border-radius: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .input-group label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+        }
+
+        .input-group input {
+            background: #18181c;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            outline: none;
+        }
+
+        .input-group input:focus {
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-add {
+            background: #ffffff;
+            color: #000000;
+            border: none;
+            padding: 12px;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: background-color 0.2s;
+            margin-top: 5px;
+        }
+
+        .btn-add:hover {
+            background-color: #e5e5e5;
+        }
+
+        /* Display of Current Links */
+        .links-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .link-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #242428;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 14px 20px;
+            border-radius: 14px;
+        }
+
+        .link-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .link-name {
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .link-url {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.85rem;
+            word-break: break-all;
+        }
+
+        .btn-delete {
+            background: none;
+            border: none;
+            color: #ff4a4a;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            padding: 4px 8px;
+            border-radius: 4px;
+            transition: background-color 0.2s;
+        }
+
+        .btn-delete:hover {
+            background: rgba(255, 74, 74, 0.1);
+        }
+
+        .no-links {
+            color: rgba(255, 255, 255, 0.3);
+            font-size: 0.95rem;
+            text-align: center;
+            padding: 20px;
+            border: 1px dashed rgba(255, 255, 255, 0.1);
+            border-radius: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="dashboard-header">
+        <a href="index.html" class="logo">requiemx</a>
+        <button class="btn-signout" id="signOutBtn">Sign Out</button>
+    </header>
+
+    <main class="workspace">
+        <h1 class="welcome-title">My Dashboard</h1>
+        <p class="welcome-subtitle">Logged in as <span id="userDisplay">...</span></p>
+
+        <h2 class="section-title">Add a link to your page</h2>
+        <div class="link-creator-form">
+            <div class="input-group">
+                <label for="linkTitle">Link Title (e.g., Discord, Instagram, My Web)</label>
+                <input type="text" id="linkTitle" placeholder="My Discord server">
+            </div>
+            <div class="input-group">
+                <label for="linkUrl">Destination URL</label>
+                <input type="url" id="linkUrl" placeholder="https://discord.gg/yourlink">
+            </div>
+            <button class="btn-add" id="addLinkBtn">Add New Link</button>
+        </div>
+
+        <h2 class="section-title">Your Live Links</h2>
+        <div class="links-list" id="linksList">
+            <div class="no-links">You haven't added any links to your page yet.</div>
+        </div>
+    </main>
+
+    <script>
+        const SUPABASE_URL = "https://vhozskumzytvbidirism.supabase.co"; 
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZob3pza3Vtenl0dmJpZGlyaXNtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQwMjgwNjEsImV4cCI6MjA5OTYwNDA2MX0.1t82AH9lXFJ18kpNOcHHH_8Xo2mvD-BeHrPjFbO5EK4"; 
+
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const signOutBtn = document.getElementById('signOutBtn');
+        const userDisplay = document.getElementById('userDisplay');
+        const linkTitleInput = document.getElementById('linkTitle');
+        const linkUrlInput = document.getElementById('linkUrl');
+        const addLinkBtn = document.getElementById('addLinkBtn');
+        const linksListContainer = document.getElementById('linksList');
+
+        let userSession = null;
+        let mockLinksStorage = []; // Local link mock database
+
+        // Check auth status on load
+        async function checkSession() {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (!session) {
+                // If not logged in, bounce back to landing page
+                window.location.href = "index.html";
+                return;
+            }
+            userSession = session;
+
+            // Grab the clean username out of the virtual email we generated
+            const virtualEmail = session.user.email;
+            const cleanUsername = virtualEmail.split('@')[0];
+            userDisplay.innerText = cleanUsername;
+
+            // Load saved links from local storage (scoped specifically to this username)
+            loadUserLinks(cleanUsername);
+        }
+
+        checkSession();
+
+        // Local Storage Handler to store user configurations
+        function loadUserLinks(username) {
+            const saved = localStorage.getItem(`requiemx_links_${username}`);
+            if (saved) {
+                mockLinksStorage = JSON.parse(saved);
+            } else {
+                mockLinksStorage = [];
+            }
+            renderLinks();
+        }
+
+        function saveUserLinks() {
+            if (!userSession) return;
+            const cleanUsername = userSession.user.email.split('@')[0];
+            localStorage.setItem(`requiemx_links_${cleanUsername}`, JSON.stringify(mockLinksStorage));
+            renderLinks();
+        }
+
+        // Render live list of custom links
+        function renderLinks() {
+            if (mockLinksStorage.length === 0) {
+                linksListContainer.innerHTML = `<div class="no-links">You haven't added any links to your page yet.</div>`;
+                return;
+            }
+
+            linksListContainer.innerHTML = '';
+            mockLinksStorage.forEach((link, index) => {
+                const item = document.createElement('div');
+                item.className = 'link-item';
+                item.innerHTML = `
+                    <div class="link-info">
+                        <span class="link-name">${escapeHtml(link.title)}</span>
+                        <span class="link-url">${escapeHtml(link.url)}</span>
+                    </div>
+                    <button class="btn-delete" onclick="deleteLink(${index})">Delete</button>
+                `;
+                linksListContainer.appendChild(item);
+            });
+        }
+
+        // Add a new link to state & local storage
+        addLinkBtn.addEventListener('click', () => {
+            const title = linkTitleInput.value.trim();
+            let url = linkUrlInput.value.trim();
+
+            if (!title || !url) {
+                alert("Please fill out both the title and the link URL!");
+                return;
+            }
+
+            // Auto prepends https:// if they type "instagram.com"
+            if (!/^https?:\/\//i.test(url)) {
+                url = 'https://' + url;
+            }
+
+            mockLinksStorage.push({ title, url });
+            saveUserLinks();
+
+            // Clear inputs
+            linkTitleInput.value = '';
+            linkUrlInput.value = '';
+        });
+
+        // Delete a link
+        window.deleteLink = function(index) {
+            mockLinksStorage.splice(index, 1);
+            saveUserLinks();
+        };
+
+        // Sign Out function
+        signOutBtn.addEventListener('click', async () => {
+            const { error } = await supabaseClient.auth.signOut();
+            window.location.href = "index.html";
+        });
+
+        // Security helper to prevent HTML injection inside custom links
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+    </script>
+
+</body>
+</html>
