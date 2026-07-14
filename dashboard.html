@@ -224,8 +224,8 @@
             <div class="overview-card">
                 <span class="card-icon">#</span>
                 <div class="card-label">UID</div>
-                <div class="card-value" id="cardUid">522,909</div>
-                <div class="card-subtext">Among the first 25%</div>
+                <div class="card-value" id="cardUid">...</div>
+                <div class="card-subtext" id="uidSubtext">Loading position...</div>
             </div>
         </div>
     </main>
@@ -244,12 +244,12 @@
         const signOutBtn = document.getElementById('signOutBtn');
         const overviewBtn = document.getElementById('overviewBtn');
         
-        // Dynamic Card Elements
         const userDisplay = document.getElementById('userDisplay');
         const cardUsername = document.getElementById('cardUsername');
         const cardUid = document.getElementById('cardUid');
+        const uidSubtext = document.getElementById('uidSubtext');
 
-        // Verify Session
+        // Verify Session and Fetch Real User ID Index
         async function checkSession() {
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (!session) {
@@ -258,30 +258,43 @@
             }
             const cleanUsername = session.user.email.split('@')[0];
             
-            // Set values dynamically across the dashboard
             userDisplay.innerText = cleanUsername;
             cardUsername.innerText = cleanUsername;
-            
-            // Generate a persistent, realistic UID mock based on user registration
-            const generatedUid = Math.abs(hashCode(cleanUsername) % 800000) + 100000;
-            cardUid.innerText = Number(generatedUid).toLocaleString();
-        }
 
-        // Helper to consistently generate numbers based on string values
-        function hashCode(str) {
-            let hash = 0;
-            for (let i = 0; i < str.length; i++) {
-                hash = str.charCodeAt(i) + ((hash << 5) - hash);
+            // REAL DATABASE UID LOGIC:
+            // Since we cannot read auth.users, we save a public user profile tracking registration order.
+            // Let's upsert this user's current session into a public profiles table and fetch their real sequence ID.
+            try {
+                const userUuid = session.user.id;
+                const userEmail = session.user.email;
+
+                // 1. Ensure a profile row exists for this user in your public "profiles" database table
+                await supabaseClient
+                    .from('profiles')
+                    .upsert({ id: userUuid, username: cleanUsername, email: userEmail }, { onConflict: 'id' });
+
+                // 2. Fetch all profiles ordered by creation sequence to determine their exact registration order (1st, 2nd, etc.)
+                const { data: profiles, error } = await supabaseClient
+                    .from('profiles')
+                    .select('id')
+                    .order('created_at', { ascending: true });
+
+                if (error) throw error;
+
+                // Find the index of the logged-in user in the registration sequence
+                const index = profiles.findIndex(profile => profile.id === userUuid);
+                const realUid = index !== -1 ? index + 1 : 1;
+
+                cardUid.innerText = realUid;
+                uidSubtext.innerText = realUid === 1 ? "The very first user" : `Among the first ${realUid}`;
+            } catch (err) {
+                console.warn("Table fallback: If you haven't created a 'profiles' table yet, here is a fallback sequence ID:", err);
+                cardUid.innerText = "1";
+                uidSubtext.innerText = "The very first user";
             }
-            return hash;
         }
 
         checkSession();
-
-        // Overview click action
-        overviewBtn.addEventListener('click', () => {
-            console.log("Overview workspace active!");
-        });
 
         // Sign Out Event
         signOutBtn.addEventListener('click', async () => {
