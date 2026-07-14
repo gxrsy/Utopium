@@ -14,7 +14,7 @@
         }
 
         body {
-            background-color: #0c0d10; /* Pure deep slate/black background */
+            background-color: #1a1a1a; /* Clean dark gray background */
             color: #ffffff;
             height: 100vh;
             width: 100vw;
@@ -23,12 +23,12 @@
             overflow: hidden;
         }
 
-        /* --- SIDEBAR STYLE --- */
+        /* --- SIDEBAR STYLE (DARK GRAY THEME) --- */
         .sidebar {
             width: 260px;
-            background-color: #0f1115; /* Matching dark panel color */
+            background-color: #242424; /* Slightly lighter dark-gray panel */
             height: 100%;
-            border-right: 1px solid rgba(0, 191, 255, 0.05);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
             display: flex;
             flex-direction: column;
             padding: 24px 16px;
@@ -43,7 +43,7 @@
             align-items: center;
             gap: 10px;
             font-size: 1.25rem;
-            font-weight: 800;
+            font-weight: 700;
             letter-spacing: -0.5px;
             color: #ffffff;
             text-decoration: none;
@@ -51,11 +51,7 @@
             padding-left: 8px;
         }
 
-        .sidebar-header span {
-            color: #00bfff; /* Electric Blue Logo Icon accent */
-        }
-
-        /* Search Box styling matching the Ctrl+K layout */
+        /* Search Box styling */
         .search-container {
             position: relative;
             margin-bottom: 20px;
@@ -63,8 +59,8 @@
 
         .search-input {
             width: 100%;
-            background: #15181e;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: #1a1a1a;
+            border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 10px;
             padding: 10px 12px 10px 36px;
             color: #ffffff;
@@ -74,8 +70,7 @@
         }
 
         .search-input:focus {
-            border-color: rgba(0, 191, 255, 0.3);
-            background: #171b22;
+            border-color: rgba(255, 255, 255, 0.2);
         }
 
         .search-icon {
@@ -126,22 +121,21 @@
         }
 
         .nav-item:hover {
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(255, 255, 255, 0.05);
             color: #ffffff;
         }
 
         /* Dropdown Group Styling */
         .nav-dropdown {
-            background: rgba(0, 191, 255, 0.04);
-            color: #00bfff;
-            border: 1px solid rgba(0, 191, 255, 0.05);
+            background: rgba(255, 255, 255, 0.04);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .nav-dropdown-arrow {
             margin-left: auto;
             font-size: 0.7rem;
-            color: #00bfff;
-            transition: transform 0.2s;
+            color: rgba(255, 255, 255, 0.5);
         }
 
         .dropdown-submenu {
@@ -162,10 +156,10 @@
         }
 
         .submenu-item:hover, .submenu-item.active {
-            color: #00bfff;
+            color: #ffffff;
         }
 
-        /* Footer Container - Support Boxes & Share Buttons */
+        /* Footer Container */
         .sidebar-footer {
             display: flex;
             flex-direction: column;
@@ -176,15 +170,15 @@
 
         /* Support Box panel */
         .support-box {
-            background: #14171d;
-            border: 1px solid rgba(255, 255, 255, 0.03);
+            background: #1a1a1a;
+            border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 16px;
             padding: 16px;
         }
 
         .support-title {
             font-size: 0.85rem;
-            color: rgba(255, 255, 255, 0.8);
+            color: rgba(255, 255, 255, 0.6);
             font-weight: 600;
             line-height: 1.4;
             margin-bottom: 12px;
@@ -196,9 +190,9 @@
             justify-content: center;
             gap: 8px;
             width: 100%;
-            background: rgba(0, 191, 255, 0.08);
-            border: 1px solid rgba(0, 191, 255, 0.15);
-            color: #00bfff;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ffffff;
             padding: 10px;
             border-radius: 10px;
             text-decoration: none;
@@ -208,8 +202,7 @@
         }
 
         .btn-support:hover {
-            background: rgba(0, 191, 255, 0.15);
-            border-color: #00bfff;
+            background: rgba(255, 255, 255, 0.1);
         }
 
         .btn-mypage {
@@ -218,9 +211,9 @@
             justify-content: center;
             gap: 8px;
             width: 100%;
-            background: rgba(0, 191, 255, 0.06);
-            border: 1px solid rgba(0, 191, 255, 0.1);
-            color: #ffffff;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.8);
             padding: 10px;
             border-radius: 10px;
             text-decoration: none;
@@ -231,16 +224,17 @@
         }
 
         .btn-mypage:hover {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.08);
+            color: #ffffff;
         }
 
-        /* Bottom pill-shaped share profile button */
+        /* Bottom Share Button */
         .btn-share {
             display: flex;
             align-items: center;
             justify-content: center;
             gap: 8px;
-            background: #00bfff;
+            background: #ffffff;
             color: #000000;
             border: none;
             width: 100%;
@@ -253,12 +247,10 @@
         }
 
         .btn-share:hover {
-            background-color: #33ccff;
-            box-shadow: 0 0 15px rgba(0, 191, 255, 0.25);
+            background-color: #e5e5e5;
         }
 
-
-        /* --- REST OF PAGE LAYOUT --- */
+        /* --- MAIN APP CANVAS --- */
         .main-content {
             flex-grow: 1;
             height: 100%;
@@ -268,7 +260,7 @@
             justify-content: space-between;
         }
 
-        /* Top Bar for original branding & actions */
+        /* Top Bar */
         .top-navbar {
             width: 100%;
             display: flex;
@@ -277,7 +269,6 @@
             padding: 30px 40px;
         }
 
-        /* Top-Left Logo matching original request */
         .logo {
             font-size: 1.5rem;
             font-weight: 700;
@@ -303,7 +294,7 @@
             background: rgba(255, 255, 255, 0.15);
         }
 
-        /* Bottom-Right User Indicator styling matching request */
+        /* Bottom-Right User Indicator */
         .user-status {
             position: absolute;
             bottom: 30px;
@@ -324,7 +315,7 @@
     <aside class="sidebar">
         <div>
             <a href="index.html" class="sidebar-header">
-                <span>⚡</span> requiemx
+                requiemx
             </a>
 
             <div class="search-container">
