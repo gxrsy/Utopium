@@ -35,6 +35,18 @@
             letter-spacing: -0.5px;
         }
 
+        /* Account Header placed directly under logo */
+        .account-header {
+            position: absolute;
+            top: 80px;
+            left: 40px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.4);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
         /* Top-Right Sign Out Button */
         .btn-signout {
             position: absolute;
@@ -74,6 +86,8 @@
 <body>
 
     <a href="index.html" class="logo">requiemx</a>
+    
+    <div class="account-header">Account</div>
     
     <button class="btn-signout" id="signOutBtn">Sign Out</button>
 
