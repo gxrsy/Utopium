@@ -3,163 +3,581 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Math Skin Outline Tracker</title>
+    <title>requiemx</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <style>
-        body {
-            font-family: sans-serif;
-            background-color: #000;
-            color: #fff;
-            text-align: center;
+        /* Base Page Setup */
+        * {
+            box-sizing: border-box;
             margin: 0;
-            padding: 10px;
+            padding: 0;
         }
-        .container {
+
+        body {
+            background-color: #121212; /* Sleek dark gray background */
+            height: 100vh;
+            width: 100vw;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             position: relative;
-            width: 100%;
-            max-width: 360px;
-            margin: 0 auto;
-            aspect-ratio: 3/4;
-            border-radius: 12px;
             overflow: hidden;
         }
-        video, canvas {
+
+        /* Top Header */
+        .header-nav {
             position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 10;
+        }
+
+        .logo {
+            color: #ffffff;
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            text-decoration: none;
+        }
+
+        .btn-signin {
+            color: #000000;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 600;
+            padding: 10px 24px;
+            border-radius: 50px;
+            background-color: #ffffff;
+            transition: all 0.2s ease;
+            display: inline-block;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-signin:hover {
+            background-color: #e5e5e5;
+            transform: scale(1.02);
+        }
+
+        /* Bottom Center Claim Bar (Matches Guns.lol/Link-in-bio style) */
+        .claim-container {
+            position: absolute;
+            bottom: 12%;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 90%;
+            max-width: 500px;
+            z-index: 5;
+            text-align: center;
+        }
+
+        .claim-title {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .claim-box {
+            display: flex;
+            width: 100%;
+            background: #18181c;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 8px 8px 8px 20px;
+            align-items: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        .claim-prefix {
+            color: rgba(255, 255, 255, 0.35);
+            font-weight: 600;
+            font-size: 1.05rem;
+            user-select: none;
+            margin-right: 2px;
+        }
+
+        .claim-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #ffffff;
+            font-size: 1.05rem;
+            font-weight: 600;
+            padding: 10px 0;
+        }
+
+        .claim-input::placeholder {
+            color: rgba(255, 255, 255, 0.2);
+        }
+
+        .btn-claim {
+            background: #ffffff;
+            color: #000000;
+            border: none;
+            outline: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+
+        .btn-claim:hover {
+            background-color: #e5e5e5;
+            transform: translateY(-1px);
+        }
+
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            transform: scaleX(-1); /* Mirror view */
-        }
-        #ui-overlay {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            color: #00ff00;
-            font-family: monospace;
-            font-size: 11px;
-            text-align: left;
-            z-index: 10;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
             pointer-events: none;
-            background: rgba(0,0,0,0.6);
-            padding: 5px;
-            border-radius: 4px;
+            transition: opacity 0.3s ease;
+            z-index: 100;
+        }
+
+        /* Active class to show modal */
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Login/Signup Card */
+        .login-card {
+            background: #18181c;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 24px;
+            padding: 3.5rem 2.5rem 3rem 2.5rem;
+            width: 90%;
+            max-width: 440px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            position: relative;
+        }
+
+        .modal-overlay.active .login-card {
+            transform: scale(1);
+        }
+
+        /* X Close Button in Top Right */
+        .close-x-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: color 0.2s, transform 0.2s;
+            line-height: 1;
+            padding: 4px;
+        }
+
+        .close-x-btn:hover {
+            color: #ffffff;
+            transform: scale(1.1);
+        }
+
+        .login-card h2 {
+            color: #ffffff;
+            margin-bottom: 0.75rem;
+            font-size: 1.85rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .login-card p {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Input Fields */
+        .input-group {
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-bottom: 0.6rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px 16px;
+            background: #242428;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            color: #ffffff;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s, background-color 0.2s;
+        }
+
+        .input-group input:focus {
+            border-color: rgba(255, 255, 255, 0.2);
+            background-color: #2a2a2e;
+        }
+
+        /* Hidden components by default */
+        #confirmPasswordGroup {
+            display: none;
+        }
+
+        /* Error/Status Messages */
+        .error-msg {
+            color: #ff4a4a;
+            font-size: 0.85rem;
+            text-align: left;
+            margin-top: -0.75rem;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .success-msg {
+            color: #4aff80;
+            font-size: 0.85rem;
+            text-align: left;
+            margin-top: -0.75rem;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        /* Action Buttons */
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: #ffffff;
+            color: #000000;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            margin-top: 0.5rem;
+        }
+
+        .btn-submit:hover {
+            background-color: #e5e5e5;
+        }
+
+        .btn-submit:disabled {
+            background-color: rgba(255, 255, 255, 0.3);
+            cursor: not-allowed;
+        }
+
+        /* Navigation Toggles */
+        .toggle-container {
+            margin-top: 1.75rem;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .toggle-btn {
+            background: none;
+            border: none;
+            color: #ffffff;
+            font-weight: 700;
+            cursor: pointer;
+            text-decoration: underline;
+            padding: 0;
+            font-size: 0.9rem;
+            margin-left: 4px;
         }
     </style>
 </head>
 <body>
 
-    <h2 style="font-size: 1.2rem; margin: 10px 0 5px 0;">Pure Math Skin Outliner</h2>
-    <p style="font-size: 0.8rem; color: #888; margin-bottom: 10px;">Calculates skin pixels using color formulas.</p>
+    <header class="header-nav">
+        <a href="#" class="logo">requiemx</a>
+        <button class="btn-signin" id="openLogin">Sign In</button>
+    </header>
 
-    <div class="container">
-        <div id="ui-overlay">FPS: --<br>Skin Pixels: --</div>
-        <video id="webcam" autoplay playsinline muted></video>
-        <canvas id="output"></canvas>
+    <div class="claim-container">
+        <span class="claim-title">Claim your modern link-in-bio</span>
+        <div class="claim-box">
+            <span class="claim-prefix">requiemx.vercel.app/</span>
+            <input type="text" class="claim-input" id="claimInput" placeholder="username" autocomplete="off" spellcheck="false">
+            <button class="btn-claim" id="claimBtn">Claim</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="loginModal">
+        <div class="login-card" id="loginCard">
+            <button class="close-x-btn" id="closeLogin" aria-label="Close modal">✕</button>
+
+            <h2 id="modalTitle">Welcome Back</h2>
+            <p id="modalSubtitle">Sign in to manage your profile</p>
+            
+            <form id="authForm" novalidate>
+                <div class="input-group" id="usernameGroup">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" placeholder="requiem_user" required autocomplete="username">
+                </div>
+                
+                <div class="input-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" placeholder="••••••••" required autocomplete="current-password">
+                </div>
+
+                <div class="input-group" id="confirmPasswordGroup">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" placeholder="••••••••" autocomplete="new-password">
+                </div>
+
+                <div class="error-msg" id="errorMsgBox"></div>
+                <div class="success-msg" id="successMsgBox"></div>
+
+                <button type="submit" class="btn-submit" id="submitBtn">Sign In</button>
+            </form>
+
+            <div class="toggle-container" id="toggleContainer">
+                Don't have an account? <button class="toggle-btn" id="toggleMode">Sign up here</button>
+            </div>
+        </div>
     </div>
 
     <script>
-        const video = document.getElementById('webcam');
-        const canvas = document.getElementById('output');
-        const ctx = canvas.getContext('2d');
-        const uiOverlay = document.getElementById('ui-overlay');
+        const SUPABASE_URL = "https://vhozskumzytvbidirism.supabase.co"; 
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZob3pza3Vtenl0dmJpZGlyaXNtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQwMjgwNjEsImV4cCI6MjA5OTYwNDA2MX0.1t82AH9lXFJ18kpNOcHHH_8Xo2mvD-BeHrPjFbO5EK4"; 
 
-        let lastTime = 0;
+        // Initialize Supabase Client
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Start Mobile Camera
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } })
-            .then(stream => {
-                video.srcObject = stream;
-                requestAnimationFrame(processFrame);
-            });
+        // UI Selectors
+        const openBtn = document.getElementById('openLogin');
+        const closeBtn = document.getElementById('closeLogin');
+        const modal = document.getElementById('loginModal');
+        const authForm = document.getElementById('authForm');
+        
+        const usernameInput = document.getElementById('username');
+        const passwordInput = document.getElementById('password');
+        const confirmPasswordInput = document.getElementById('confirmPassword');
+        const confirmPasswordGroup = document.getElementById('confirmPasswordGroup');
+        const errorMsgBox = document.getElementById('errorMsgBox');
+        const successMsgBox = document.getElementById('successMsgBox');
 
-        function processFrame(time) {
-            if (video.readyState === video.HAVE_ENOUGH_DATA) {
-                canvas.width = 320; // Lower resolution for fast mobile processing
-                canvas.height = 240;
+        const modalTitle = document.getElementById('modalTitle');
+        const modalSubtitle = document.getElementById('modalSubtitle');
+        const submitBtn = document.getElementById('submitBtn');
+        const toggleContainer = document.getElementById('toggleContainer');
 
-                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const claimInput = document.getElementById('claimInput');
+        const claimBtn = document.getElementById('claimBtn');
+
+        let isSignUpMode = false;
+
+        // Open Modal (Default to login mode)
+        openBtn.addEventListener('click', () => {
+            switchToMode(false);
+            modal.classList.add('active');
+        });
+
+        // Close Modal via top right X button
+        closeBtn.addEventListener('click', () => {
+            modal.classList.remove('active');
+            resetForm();
+        });
+
+        // Handle the landing page "Claim" bar button action
+        claimBtn.addEventListener('click', () => {
+            const desiredUsername = claimInput.value.trim().toLowerCase();
+            if (desiredUsername) {
+                switchToMode(true); // Switch directly to Sign Up mode
+                usernameInput.value = desiredUsername;
+                modal.classList.add('active');
+                passwordInput.focus();
+            } else {
+                claimInput.focus();
+            }
+        });
+
+        // Open modal if user hits 'Enter' inside the claim input
+        claimInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                claimBtn.click();
+            }
+        });
+
+        // Clear errors and input fields
+        function resetForm() {
+            authForm.reset();
+            errorMsgBox.style.display = "none";
+            successMsgBox.style.display = "none";
+            submitBtn.disabled = false;
+        }
+
+        // Toggle Functionality Between Login & Sign Up
+        function switchToMode(toSignUp) {
+            isSignUpMode = toSignUp;
+            resetForm();
+
+            if (isSignUpMode) {
+                modalTitle.innerText = "Create Account";
+                modalSubtitle.innerText = "Claim your profile link";
+                submitBtn.innerText = "Sign Up";
                 
-                const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                const data = imgData.data;
-                const w = canvas.width;
-                const h = canvas.height;
+                confirmPasswordGroup.style.display = "block";
+                confirmPasswordInput.required = true;
+                
+                toggleContainer.innerHTML = `Already have an account? <button class="toggle-btn" id="toggleMode">Sign in here</button>`;
+            } else {
+                modalTitle.innerText = "Welcome Back";
+                modalSubtitle.innerText = "Sign in to manage your profile";
+                submitBtn.innerText = "Sign In";
+                
+                confirmPasswordGroup.style.display = "none";
+                confirmPasswordInput.required = false;
+                
+                toggleContainer.innerHTML = `Don't have an account? <button class="toggle-btn" id="toggleMode">Sign up here</button>`;
+            }
+            setupToggleListener(); // Re-bind event listener
+        }
 
-                // Create a secondary map to keep track of where skin is detected
-                const skinMap = new Uint8Array(w * h);
-                let skinPixelCount = 0;
+        function setupToggleListener() {
+            const toggleBtn = document.getElementById('toggleMode');
+            if (toggleBtn) {
+                toggleBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    switchToMode(!isSignUpMode);
+                });
+            }
+        }
 
-                // 1. Math Formula for Skin Detection (YCbCr Rules)
-                for (let i = 0; i < data.length; i += 4) {
-                    const r = data[i];
-                    const g = data[i+1];
-                    const b = data[i+2];
+        setupToggleListener();
 
-                    // Convert RGB to YCbCr
-                    const Y = 0.299 * r + 0.587 * g + 0.114 * b;
-                    const Cb = 128 - 0.168736 * r - 0.331264 * g + 0.5 * b;
-                    const Cr = 128 + 0.5 * r - 0.418688 * g - 0.081312 * b;
+        // Database Auth Handling
+        authForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            errorMsgBox.style.display = "none";
+            successMsgBox.style.display = "none";
 
-                    // Standard human skin color range criteria
-                    if (Cr > 135 && Cr < 180 && Cb > 85 && Cb < 135 && Y > 80) {
-                        skinMap[i / 4] = 1;
-                        skinPixelCount++;
-                    }
+            const username = usernameInput.value.trim().toLowerCase();
+            const password = passwordInput.value;
+
+            if (!username) {
+                showError("Username is required.");
+                return;
+            }
+
+            // Create a virtual email under the hood so Supabase is happy
+            const virtualEmail = `${username}@requiemx.local`;
+
+            if (isSignUpMode) {
+                const confirmPassword = confirmPasswordInput.value;
+
+                if (username.length < 3) {
+                    showError("Username must be at least 3 characters.");
+                    return;
                 }
+                if (password.length < 8) {
+                    showError("Password must be at least 8 characters long.");
+                    return;
+                }
+                if (!/[A-Z]/.test(password)) {
+                    showError("Password must contain at least one uppercase letter.");
+                    return;
+                }
+                if (!/[!@#$%^&*(),.?":{}|<>_]/.test(password)) {
+                    showError("Password must contain a special character.");
+                    return;
+                }
+                if (password !== confirmPassword) {
+                    showError("Passwords do not match.");
+                    return;
+                }
+            }
 
-                // Keep track of outermost skin boundary points
-                let minX = w, maxX = 0, maxY = 0;
-                let leftBound = null, rightBound = null, bottomBound = null;
+            submitBtn.disabled = true;
 
-                // 2. Draw Skin Outline
-                ctx.strokeStyle = "#00ff00"; // Neon green outline
-                ctx.lineWidth = 1.5;
-
-                for (let y = 1; y < h - 1; y++) {
-                    for (let x = 1; x < w - 1; x++) {
-                        const idx = y * w + x;
-                        
-                        // If it's a skin pixel, check if it borders a non-skin pixel (an edge)
-                        if (skinMap[idx] === 1) {
-                            const isEdge = (
-                                skinMap[idx - 1] === 0 || 
-                                skinMap[idx + 1] === 0 || 
-                                skinMap[idx - w] === 0 || 
-                                skinMap[idx + w] === 0
-                            );
-
-                            if (isEdge) {
-                                // Draw outline pixel
-                                ctx.fillStyle = "#00ff00";
-                                ctx.fillRect(x, y, 1.5, 1.5);
-
-                                // Track boundary points for the dots
-                                if (x < minX && y > h * 0.3) { minX = x; leftBound = {x, y}; }
-                                if (x > maxX && y > h * 0.3) { maxX = x; rightBound = {x, y}; }
-                                if (y > maxY && x > w * 0.3 && x < w * 0.7) { maxY = y; bottomBound = {x, y}; }
-                            }
+            if (isSignUpMode) {
+                // --- CREATE ACCOUNT (SIGN UP) ---
+                const { data, error } = await supabaseClient.auth.signUp({
+                    email: virtualEmail,
+                    password: password,
+                    options: {
+                        data: {
+                            username: username
                         }
-                    }
-                }
-
-                // 3. Draw Landmark Tracking Dots (Blue Dots)
-                ctx.fillStyle = "#00ffff"; // Cyan tracking dots
-                const landmarks = [leftBound, rightBound, bottomBound];
-                landmarks.forEach(pt => {
-                    if (pt) {
-                        ctx.beginPath();
-                        ctx.arc(pt.x, pt.y, 4, 0, 2 * Math.PI);
-                        ctx.fill();
                     }
                 });
 
-                // Update UI performance tracker
-                const fps = Math.round(1000 / (time - lastTime));
-                lastTime = time;
-                uiOverlay.innerHTML = `FPS: ${fps}<br>Skin Pixels: ${skinPixelCount}`;
+                if (error) {
+                    showError(error.message);
+                    submitBtn.disabled = false;
+                } else {
+                    showSuccess("Account created successfully! Redirecting...");
+                    setTimeout(() => {
+                        window.location.href = "https://requiemx.vercel.app/dashboard.html";
+                    }, 1000);
+                }
+            } else {
+                // --- SIGN IN WITH USERNAME ---
+                const { data, error } = await supabaseClient.auth.signInWithPassword({
+                    email: virtualEmail,
+                    password: password,
+                });
+
+                if (error) {
+                    const cleanMessage = error.message.replace(virtualEmail, username);
+                    showError(cleanMessage === "Invalid login credentials" ? "Invalid username or password." : cleanMessage);
+                    submitBtn.disabled = false;
+                } else {
+                    window.location.href = "https://requiemx.vercel.app/dashboard.html";
+                }
             }
-            requestAnimationFrame(processFrame);
+        });
+
+        // Active session listener
+        supabaseClient.auth.onAuthStateChange((event, session) => {
+            if (event === 'SIGNED_IN') {
+                window.location.href = "https://requiemx.vercel.app/dashboard.html";
+            }
+        });
+
+        function showError(message) {
+            errorMsgBox.innerText = message;
+            errorMsgBox.style.display = "block";
+        }
+
+        function showSuccess(message) {
+            successMsgBox.innerText = message;
+            successMsgBox.style.display = "block";
         }
     </script>
+
 </body>
 </html>
